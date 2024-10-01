@@ -17,7 +17,28 @@ service_token_usage = {
 }
 
 
-@router.post("/api-key")
+@router.post(
+    "/api-key",
+    summary="Get API Key",
+    description="Get an available API key based on the service type.",
+    response_description="Returns the available API key.",
+    responses={
+        200: {
+            "description": "Available API key returned.",
+            "content": {"application/json": {"example": {"api_key": "api_key_1"}}},
+        },
+        429: {
+            "description": "All API keys have reached their rate limits.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "All API keys have reached their rate limits. Please try again later."
+                    }
+                }
+            },
+        },
+    },
+)
 async def get_api_key(request: APIKeyRequest):
     tokens_needed = service_token_usage[request.type]
     # 根據不同service處理對應的token數量
