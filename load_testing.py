@@ -5,9 +5,9 @@ import datetime
 import time
 # 服務定義
 services = {
-    "service_1": {"token_consumption": 300, "latency": 20},
-    "service_2": {"token_consumption": 100, "latency": 10},
-    "service_3": {"token_consumption": 500, "latency": 40},
+    "service_1": {"latency": 20},
+    "service_2": {"latency": 10},
+    "service_3": {"latency": 40},
 }
 
 async def fetch_api_key(session, service_type):
