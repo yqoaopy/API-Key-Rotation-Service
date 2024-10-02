@@ -12,8 +12,9 @@ class FixedWindowRateLimiter:
     def is_allowed(self, tokens_needed):
         current_time = datetime.now()
 
-        # 檢查當是否更新可用token數量 依據時間
-        if current_time - self.window_start >= timedelta(seconds=self.window_seconds):
+        # 檢查是否進入新的窗口
+        if current_time >= self.window_start + timedelta(seconds=self.window_seconds):
+            # 進入新的窗口，重置 tokens 和窗口開始時間
             self.current_tokens = self.max_tokens
             self.window_start = current_time
 
