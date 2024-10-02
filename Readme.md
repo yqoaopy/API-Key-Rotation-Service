@@ -1,7 +1,44 @@
 # API Key Management System
 
 ## Project Architecture
+```
+       +---------------+
+       |    Client     |
+       +---------------+
+               |
+               |
+               v
+       +-----------------+
+       |   API Gateway    |
+       +-----------------+
+               |
+               |
+               v
+       +----------------------------+
+       | API Key Management Service |
+       +----------------------------+
+               |
+               |
+     +---------+---------+
+     |                   |
+     v                   v
++-----------------+ +-----------------+
+|   API Key 1     | |   API Key 2      |
+|  1000 tokens/min| |  3000 tokens/min |
++-----------------+ +------------------+
+     |                   |
+     |                   |
+     v                   v
++-----------------+ +-----------------+
+| Fixed Window    | | Fixed Window    |
+| Rate Limiter    | | Rate Limiter    |
+| - max_tokens:   | | - max_tokens:   |
+|   1000          | |   3000          |
+| - window_seconds:| | - window_seconds:|
+|   60            | |   60            |
++-----------------+ +-----------------+
 
+```
 ## Design Considerations
 ### API Documentation ###
 
