@@ -1,0 +1,92 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "FastAPI",
+      "version": "0.1.0"
+    },
+    "paths": {
+      "/api/v1/api-key": {
+        "post": {
+          "summary": "Get API Key",
+          "description": "Get an available API key based on the service type.",
+          "operationId": "get_api_key_api_v1_api_key_post",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIKeyRequest"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Available API key returned.",
+              "content": {
+                "application/json": {
+                  "schema": {
+  
+                  },
+                  "example": {
+                    "api_key": "api_key_1"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation error occurred, such as missing or incorrect data.",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "detail": [
+                      {
+                        "loc": [
+                          "body",
+                          "type"
+                        ],
+                        "msg": "field required",
+                        "type": "value_error.missing"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "All API keys have reached their rate limits.",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "detail": "All API keys have reached their rate limits. Please try again later."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "APIKeyRequest": {
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "service_1",
+                "service_2",
+                "service_3"
+              ],
+              "title": "Type"
+            }
+          },
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "title": "APIKeyRequest"
+        }
+      }
+    }
+  }
