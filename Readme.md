@@ -9,7 +9,7 @@
                |
                v
        +-----------------+
-       |   API Gateway    |
+       |   API Gateway   |
        +-----------------+
                |
                |
@@ -22,21 +22,21 @@
      +---------+---------+
      |                   |
      v                   v
-+-----------------+ +-----------------+
++-----------------+ +------------------+
 |   API Key 1     | |   API Key 2      |
 |  1000 tokens/min| |  3000 tokens/min |
 +-----------------+ +------------------+
      |                   |
      |                   |
      v                   v
-+-----------------+ +-----------------+
-| Fixed Window    | | Fixed Window    |
-| Rate Limiter    | | Rate Limiter    |
-| - max_tokens:   | | - max_tokens:   |
-|   1000          | |   3000          |
++------------------+ +------------------+
+| Fixed Window     | | Fixed Window     |
+| Rate Limiter     | | Rate Limiter     |
+| - max_tokens:    | | - max_tokens:    |
+|   1000           | |   3000           |
 | - window_seconds:| | - window_seconds:|
-|   60            | |   60            |
-+-----------------+ +-----------------+
+|   60             | |   60             |
++------------------+ +------------------+
 
 ```
 ## Design Considerations
