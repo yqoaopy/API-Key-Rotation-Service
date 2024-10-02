@@ -57,33 +57,21 @@ service_token_usage = {
                 }
             },
         },
-        500: {
-            "description": "An internal server error occurred.",
-            "content": {
-                "application/json": {"example": {"detail": "Internal Server Error."}}
-            },
-        },
     },
 )
 async def get_api_key(request: APIKeyRequest):
-    try:
-        tokens_needed = service_token_usage[request.type]
-        # 根據不同service處理對應的token數量
-        for api_key, rate_limiter in api_keys.items():
-            if rate_limiter.is_allowed(tokens_needed):
-                logger.info(
-                    f"API Key: {api_key} - Remaining Tokens: {rate_limiter.current_tokens}"
-                )
-                return JSONResponse(status_code=200, content={"api_key": api_key})
+    tokens_needed = service_token_usage[request.type]
+    # 根據不同service處理對應的token數量
+    for api_key, rate_limiter in api_keys.items():
+        if rate_limiter.is_allowed(tokens_needed):
+            logger.info(
+                f"API Key: {api_key} - Remaining Tokens: {rate_limiter.current_tokens}"
+            )
+            return JSONResponse(status_code=200, content={"api_key": api_key})
 
-        logger.error("All API keys have reached their rate limits.")
-        raise HTTPException(
-            status_code=429,
-            detail="All API keys have reached their rate limits. Please try again later.",
-        )
+    logger.error("All API keys have reached their rate limits.")
+    raise HTTPException(
+        status_code=429,
+        detail="All API keys have reached their rate limits. Please try again later.",
+    )
 
-    except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")  # 捕捉並記錄任何錯誤
-        raise HTTPException(
-            status_code=500, detail="Internal Server Error"
-        )  # 返回 500 錯誤

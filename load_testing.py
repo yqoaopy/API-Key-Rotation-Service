@@ -1,57 +1,43 @@
-import requests
+import aiohttp
+import asyncio
 import json
-import time
-import threading
 import datetime
-
+import time
 # 服務定義
 services = {
-    "service_1": {"token_consumption": 300, "latency": 20},
-    "service_2": {"token_consumption": 100, "latency": 10},
+    "service_1": {"token_consumption": 300, "latency": 2},
+    "service_2": {"token_consumption": 100, "latency": 1},
     "service_3": {"token_consumption": 500, "latency": 40},
 }
 
-
-def fetch_api_key(service_type):
+async def fetch_api_key(session, service_type):
     url = "http://127.0.0.1:8000/api/v1/api-key"
     payload = json.dumps({"type": service_type})
     headers = {"Content-Type": "application/json"}
 
-    response = requests.post(url, data=payload, headers=headers)
+    async with session.post(url, data=payload, headers=headers) as response:
+        if response.status == 200:
+            response_data = await response.json()
+            print(f"{datetime.datetime.now()} {service_type}: {response_data}")
+        else:
+            print(f"Request failed for {service_type} with status {response.status}")
 
-    if response.status_code == 200:
-        response_data = response.json()  # 解析 JSON 響應
+async def send_request_with_delay(service_type, latency, duration):
+    start_time = time.time()
+    async with aiohttp.ClientSession() as session:
+        while time.time() - start_time < duration:
+            await fetch_api_key(session, service_type)
+            await asyncio.sleep(latency)
+            print(f"{datetime.datetime.now()} {service_type} has finished waiting for {latency} seconds.")
 
-        print(f"{datetime.datetime.now()} {service_type}: {response_data}")
-    else:
-        print(f"Request failed for {service_type} with status {response.status_code}")
-
-
-def send_request_with_delay(service_type, latency):
-    for i in range(3):
-        fetch_api_key(service_type)  # 發送請求
-        time.sleep(latency)  # 獨立等待服務的延遲時間
-        print(
-            f"{datetime.datetime.now()} {service_type} has finished waiting for {latency} seconds."
-        )
-
-
-def control_requests():
-    threads = []
+async def control_requests(duration=300):
+    tasks = []
     for service_type, details in services.items():
         latency = details["latency"]
-        # 創建並啟動新執行緒以發送請求和等待
-        thread = threading.Thread(
-            target=send_request_with_delay, args=(service_type, latency)
-        )
-        threads.append(thread)
-        thread.start()
-
-    # 等待所有執行緒完成
-    for thread in threads:
-        thread.join()
-
+        task = send_request_with_delay(service_type, latency, duration)
+        tasks.append(task)
+    await asyncio.gather(*tasks)
 
 # 執行主程式
 if __name__ == "__main__":
-    control_requests()
+    asyncio.run(control_requests(600))
